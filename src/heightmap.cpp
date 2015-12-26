@@ -3,23 +3,28 @@
 #include <algorithm>
 
 using std::vector;
+using std::max_element;
+using std::min_element;
+using std::transform;
+using std::pow;
+using std::round;
 
 Heightmap::Heightmap(unsigned int detailLevel) 
-    : detailLevel(detailLevel), size(std::pow(2.0, detailLevel) + 1),
-      heights(size * size, 0)
+    : detailLevel(detailLevel), size(pow(2.0, detailLevel) + 1),
+      elevation(size * size, 0), channel(size * size, 0)
 {
 } // Constructor
 
 double Heightmap::at(unsigned int x, unsigned int y) const
 {
     // Bounds checking?
-    return heights[y * size + x];
+    return elevation[y * size + x];
 } // at()
 
-double & Heightmap::at(unsigned int x, unsigned int y)
+double& Heightmap::at(unsigned int x, unsigned int y)
 {
     // Bounds checking?
-    return heights[y * size + x];
+    return elevation[y * size + x];
 } // at()
 
 unsigned int Heightmap::getSize() const
@@ -27,21 +32,34 @@ unsigned int Heightmap::getSize() const
     return size;
 } // getSize();
 
-unsigned int Heightmap::getDetailLevel() const
+unsigned int Heightmap::levelOfDetail() const
 {
     return detailLevel;
-} // getDetailLevel()
+} // levelOfDetail()
 
-vector< unsigned char > Heightmap::toGrayscale() const
+void Heightmap::clear()
 {
-    double max_height = *(std::max_element(heights.begin(), heights.end()));
-    double min_height = *(std::min_element(heights.begin(), heights.end()));
-    double range = max_height - min_height;
-    vector< unsigned char > grayscale(heights.size());
-    auto src = heights.begin();
-    auto dst = grayscale.begin();
-    for(; src != heights.end(); src++, dst++) {
-        *dst = std::round(255 * (*src - min_height) / range);
-    }
-    return grayscale;
-} // toGrayscale()
+    elevation.clear();
+    channel.clear();
+} // clear()
+
+void Heightmap::resize(unsigned int detailLevel)
+{
+    clear();
+    this->detailLevel = detailLevel;
+    size = pow(2.0, detailLevel) + 1;
+    elevation.resize(size * size, 0);
+    channel.resize(size * size, 0);
+} // resize()
+
+const vector< unsigned char >& Heightmap::asImage()
+{
+    double max_elev = *(max_element(elevation.begin(), elevation.end()));
+    double min_elev = *(min_element(elevation.begin(), elevation.end()));
+    double range = max_elev - min_elev;
+    transform(elevation.begin(), elevation.end(), channel.begin(),
+            [min_elev, range](double elevation) -> unsigned char {
+                return round(255 * (elevation - min_elev) / range);
+            });
+    return channel;
+} // asImage()

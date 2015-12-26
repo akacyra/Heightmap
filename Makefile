@@ -1,7 +1,7 @@
 CXX=g++
 CPP_FILES := $(wildcard src/*.cpp)
 OBJ_FILES := $(addprefix obj/,$(notdir $(CPP_FILES:.cpp=.o)))
-LD_FLAGS :=
+LD_FLAGS := -lGLEW -lglfw3 -framework OpenGL
 CXX_FLAGS := -Wall -MMD -std=c++11 -g
 TARGET := heightmap 
 

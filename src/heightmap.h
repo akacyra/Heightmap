@@ -13,26 +13,34 @@ class Heightmap
         // Constructs a flat heightmap of height 0.0 with the specified detail level.
         Heightmap(unsigned int detailLevel);
 
-        // Returns the height at position (x, y).
+        // Returns the elevation at position (x, y).
         double at(unsigned int x, unsigned int y) const;
         double& at(unsigned int x, unsigned int y);
 
-        // Returns the size of the heightmap.
         unsigned int getSize() const;
-        // Returns the detail level of the heightmap.
-        unsigned int getDetailLevel() const;
 
-        // Returns a copy of the heightmap heights converted to 8bit grayscale values.
-        std::vector< unsigned char > toGrayscale() const;
+        unsigned int levelOfDetail() const;
+
+        // Sets the elevation of the entire heightmap to 0;
+        void clear();
+
+        // Clears and resizes the heightmap to the specified level of detail.
+        void resize(unsigned int detailLevel);
+
+        // Returns the elevation data as grayscale pixel data.
+        const std::vector< unsigned char >& asImage();
 
     private:
-        // Determines the resolution of the heightmap. Size = 2^DetialLevel + 1.
+        // The level of detail and size of each side of the heightmap. 
+        // Size = 2^DetailLevel + 1.
         unsigned int detailLevel;
-        // Side length of the square heightmap. Size = 2^DetailLevel + 1.
         unsigned int size;
-        // Stores the heights of the heightmap in a 1D vector.
-        // The number of height points is Size^2.
-        std::vector< double > heights;
+
+        // The elevation at each point of the 2D heightmap grid.
+        // The 2D grid is stored in a 1D vector, and Idx = X + Y * Size;
+        std::vector< double > elevation;
+        // Stores the elevation data as a grayscale image.
+        std::vector< unsigned char > channel;
 };
 
 #endif

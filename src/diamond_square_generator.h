@@ -10,9 +10,8 @@
 class DiamondSquareGenerator : public Generator
 {
     public:
-        // Generates a new heightmap using the current generator settings to the input
-        // heightmap.
-        void generate(Heightmap& heightmap) const;
+        // Generates a new heightmap using the current generator settings .
+        void generate(Heightmap& out) const;
 
         // Sets the value that will be used for the 4 heightmap corners.
         void setCornerSeed(double cornerSeed);
