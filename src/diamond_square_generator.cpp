@@ -4,15 +4,24 @@
 #include <random>
 #include <chrono>
 
+DiamondSquareGenerator::DiamondSquareGenerator() : cornerValue(0)
+{
+    generateRandomSeed();
+} // Constructor
+
+DiamondSquareGenerator::DiamondSquareGenerator(unsigned int seed) 
+    : cornerValue(0), seed(seed)
+{
+} // Constructor
+
 void DiamondSquareGenerator::generate(Heightmap& out) const
 {
-    unsigned int seed = std::chrono::system_clock::now().time_since_epoch().count();
-    std::default_random_engine generator(seed);;
-    std::uniform_real_distribution< double > distribution(-0.1, 0.1);
+    std::default_random_engine generator(seed);
+    std::uniform_real_distribution< double > distribution(-1.0, 1.0);
     unsigned int size = out.getSize(), sqSize = size - 1;
     unsigned int detailLevel = out.levelOfDetail();
     out.at(0, 0) = out.at(0, size - 1) = out.at(size - 1, 0) =
-        out.at(size - 1, size - 1) = cornerSeed;
+        out.at(size - 1, size - 1) = cornerValue;
     double scale = 1.0;
     for(unsigned int i = 0; i < detailLevel; i++) {
         for(unsigned int sqX = 0; sqX < size - 1; sqX += sqSize) {
@@ -62,9 +71,21 @@ void DiamondSquareGenerator::generate(Heightmap& out) const
         sqSize /= 2;
         scale /= 2.0;
     }
+    out.normalize();
 } // generate()
 
-void DiamondSquareGenerator::setCornerSeed(double cornerSeed)
+void DiamondSquareGenerator::setCornerValue(double value)
 {
-    this->cornerSeed = cornerSeed;
-} // setCornerSeed()
+    this->cornerValue = value;
+} // setCornerValue()
+
+void DiamondSquareGenerator::generateRandomSeed()
+{
+    seed = std::chrono::system_clock::now().time_since_epoch().count();
+} // generateRandomSeed()
+
+// Sets the seed that will be used for the RNG.
+void DiamondSquareGenerator::setRandomSeed(unsigned int seed)
+{
+    this->seed = seed;
+} // setRandomSeed()

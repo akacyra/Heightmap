@@ -29,19 +29,37 @@ int generate(const vector< string >& args)
 {
     auto curArg = args.begin();
     unsigned int sizeArg;
+    unsigned int seedArg;
+    bool seeded = false;
     string targetFileArg;
     if(args.empty()) {
-        cout << "Usage: generate [-o target_file] size\n" << endl;
+        cout << "Usage: generate [-o target_file] [-s seed] size\n" << endl;
         return 0;
     } 
     if(curArg->size() == 2 && (*curArg)[0] == '-') {
         switch((*curArg)[1]) {
-            case('o'): 
+            case 'o': 
                 if(curArg + 1 != args.end()) {
                     targetFileArg = *(curArg + 1);
                     curArg += 2;
                 } else {
                     cout << "Generate: -o: missing target file name." << endl;
+                    return -1;
+                }
+                break;
+            case 's':
+                if(curArg + 1 != args.end()) {
+                    curArg++;
+                    try {
+                        seedArg = stoi(*curArg);
+                    } catch(...) {
+                        cout << "Generate: invalid seed" << *curArg << endl;
+                        return -1;
+                    }
+                    seeded = true;
+                    curArg++;
+                } else {
+                    cout << "Generate: -s: missing seed value." << endl;
                     return -1;
                 }
                 break;
@@ -68,7 +86,10 @@ int generate(const vector< string >& args)
     unsigned int detailLevel = log(sizeArg - 1) / log(2);
     Heightmap heightmap(detailLevel);
     DiamondSquareGenerator generator;
-    generator.setCornerSeed(0.0);
+    if(seeded) {
+        generator.setRandomSeed(seedArg);
+    }
+    generator.setCornerValue(0.0);
     generator.generate(heightmap);
     const vector< unsigned char >& image = heightmap.asImage();
     // Output to STDOUT.
@@ -90,7 +111,7 @@ int view(const vector< string >& args)
     string sourceFileArg;
     if(curArg != args.end() && curArg->size() == 2 && (*curArg)[0] == '-') {
         switch((*curArg)[1]) {
-            case('i'): 
+            case 'i': 
                 if(curArg + 1 != args.end()) {
                     sourceFileArg = *(curArg + 1);
                     curArg += 2;
@@ -146,6 +167,8 @@ int help(const vector< string >& args)
                     "Options:\n"
                     "  -o  Outputs image to target_file instead of STDOUT."
                     " PNG is currently the only supported image format.\n"
+                    "  -s  Seeds the random number generator with the value"
+                    " seed.\n"
                  << endl;
             return 0;
         } else if(args[0] == "view") {

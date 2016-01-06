@@ -1,7 +1,7 @@
 #ifndef __HEIGHTMAP_H__
 #define __HEIGHTMAP_H__
 
-#include <vector>
+#include "array2d.h"
 
 // Represents the height of a surface at evenly-spaced points on a 2D grid.
 //
@@ -24,11 +24,11 @@ class Heightmap
         // Sets the elevation of the entire heightmap to 0;
         void clear();
 
-        // Clears and resizes the heightmap to the specified level of detail.
-        void resize(unsigned int detailLevel);
-
         // Returns the elevation data as grayscale pixel data.
         const std::vector< unsigned char >& asImage();
+
+        // Normalizes the range of elevation values to be between 0 and 1.
+        void normalize();
 
     private:
         // The level of detail and size of each side of the heightmap. 
@@ -38,7 +38,7 @@ class Heightmap
 
         // The elevation at each point of the 2D heightmap grid.
         // The 2D grid is stored in a 1D vector, and Idx = X + Y * Size;
-        std::vector< double > elevation;
+        Array2D< double > elevation;
         // Stores the elevation data as a grayscale image.
         std::vector< unsigned char > channel;
 };
